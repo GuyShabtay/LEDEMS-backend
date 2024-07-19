@@ -15,7 +15,7 @@ app.post('/register', async (req, res) => {
   const { userName, id, password } = req.body;
 
   try {
-    const userExists = await pool.query('SELECT * FROM ledems."Users" WHERE id = $1', [id]);
+    const userExists = await pool.query('SELECT * FROM public."Users" WHERE id = $1', [id]);
 
     if (userExists.rows.length > 0) {
       return res.status(400).json({ error: 'User already exists' });
@@ -24,7 +24,7 @@ app.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = await pool.query(
-      'INSERT INTO ledems."Users" (user_name, id, password) VALUES ($1, $2, $3) RETURNING *',
+      'INSERT INTO public."Users" (user_name, id, password) VALUES ($1, $2, $3) RETURNING *',
       [userName, id, hashedPassword]
     );
 
@@ -39,7 +39,7 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { id, password } = req.body;
   try {
-    const user = await pool.query('SELECT * FROM ledems."Users" WHERE id = $1', [id]);
+    const user = await pool.query('SELECT * FROM public."Users" WHERE id = $1', [id]);
 
     if (user.rows.length === 0) {
       return res.status(400).json({ error: 'Invalid ID or Password' });
@@ -62,7 +62,7 @@ app.post('/login', async (req, res) => {
 // Get all users
 app.get('/users', async (req, res) => {
   try {
-    const allUsers = await pool.query('SELECT * FROM ledems."Users"');
+    const allUsers = await pool.query('SELECT * FROM public."Users"');
     res.json(allUsers.rows);
   } catch (err) {
     console.error(err.message);
@@ -75,12 +75,12 @@ app.post('/suspects', async (req, res) => {
   const { id, name } = req.body;
 
   try {
-    const suspectExists = await pool.query('SELECT * FROM ledems."Suspects" WHERE id = $1', [id]);
+    const suspectExists = await pool.query('SELECT * FROM public."Suspects" WHERE id = $1', [id]);
     if (suspectExists.rows.length > 0) {
       return res.status(400).json({ error: 'Suspect with this ID already exists' });
     }
     const newSuspect = await pool.query(
-      'INSERT INTO ledems."Suspects" (id, name) VALUES ($1, $2) RETURNING *',
+      'INSERT INTO public."Suspects" (id, name) VALUES ($1, $2) RETURNING *',
       [id, name]
     );
 
@@ -96,7 +96,7 @@ app.post('/evidences', async (req, res) => {
   const { suspectName, type, description, suspectId,fileName,fileUrl } = req.body;
   try {
     const newEvidence = await pool.query(
-      'INSERT INTO ledems."Evidences" (suspect_name, type, description, date, suspect_id,file_name, file_url) VALUES ($1, $2, $3, CURRENT_DATE, $4, $5,$6) RETURNING *',
+      'INSERT INTO public."Evidences" (suspect_name, type, description, date, suspect_id,file_name, file_url) VALUES ($1, $2, $3, CURRENT_DATE, $4, $5,$6) RETURNING *',
       [suspectName, type, description, suspectId,fileName,fileUrl]
     );
 
@@ -111,7 +111,7 @@ app.post('/evidences', async (req, res) => {
 app.get('/evidences/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const evidences = await pool.query('SELECT * FROM ledems."Evidences" WHERE suspect_id = $1', [id]);
+    const evidences = await pool.query('SELECT * FROM public."Evidences" WHERE suspect_id = $1', [id]);
     res.json(evidences.rows);
   } catch (err) {
     console.error(err.message);
@@ -123,7 +123,7 @@ app.get('/evidences/:id', async (req, res) => {
 app.get('/suspects/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const suspect = await pool.query('SELECT * FROM ledems."Suspects" WHERE id = $1', [id]);
+    const suspect = await pool.query('SELECT * FROM public."Suspects" WHERE id = $1', [id]);
     
     if (suspect.rows.length === 0) {
       return res.status(404).json({ error: 'Suspect not found' });
@@ -143,7 +143,7 @@ app.put('/evidences/:id', async (req, res) => {
   
   try {
     const updatedEvidence = await pool.query(
-      'UPDATE ledems."Evidences" SET type = $1, description = $2, file_name = $3,file_url = $4 WHERE id = $5 RETURNING *',
+      'UPDATE public."Evidences" SET type = $1, description = $2, file_name = $3,file_url = $4 WHERE id = $5 RETURNING *',
       [type, description,fileName, fileUrl, id]
     );
     if (updatedEvidence.rows.length === 0) {
@@ -160,7 +160,7 @@ app.put('/evidences/:id', async (req, res) => {
 app.delete('/evidences/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM ledems."Evidences" WHERE id = $1', [id]);
+    await pool.query('DELETE FROM public."Evidences" WHERE id = $1', [id]);
     res.json({ message: 'Evidence deleted successfully' });
   } catch (err) {
     console.error('Error deleting evidence:', err.message);
