@@ -107,7 +107,7 @@ app.post('/evidences', async (req, res) => {
   }
 });
 
-// Get all evidences for a specific suspect suspect ID
+// Get all evidences for a specific suspect ID
 app.get('/evidences/:id', async (req, res) => {
   const { id } = req.params;
   try {
