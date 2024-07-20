@@ -1,5 +1,5 @@
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -166,6 +166,14 @@ app.delete('/evidences/:id', async (req, res) => {
     console.error('Error deleting evidence:', err.message);
     res.status(500).send('Server Error');
   }
+});
+
+app.get("/*", function (req, res) {
+  res.sendFile(path.join(__dirname, "dist/index.html"), function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
 });
 
 app.listen(PORT, () => {
