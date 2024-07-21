@@ -19,7 +19,6 @@ SECRET_KEY="your secret key"
 ## Technologies
 - Node.js
 - Express
-- PostgreSql
+- PostgreSQL
 - Bcrypt
 - JWT
-- data encryption
